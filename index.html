@@ -39,23 +39,6 @@
             left: -100px;
         }
 
-        #startButton {
-            padding: 10px 20px;
-            background-color: red;
-            color: white;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            margin: 5px;
-            position: absolute;
-            left: -400px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        #startButton:hover {
-            background-color: #e0e0e0;
-            color: black;
-        }
-
         #notam-description {
             text-align: left;
             font-size: 30px;
@@ -78,7 +61,7 @@
             font-weight: bold;
         }
 
-        #resetButton {
+        #resetButton, #startButton {
             padding: 10px 20px;
             background-color: red;
             color: white;
@@ -88,12 +71,12 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        #resetButton.normal {
+        #resetButton.normal, #startButton.normal {
             background-color: white;
             color: black;
         }
 
-        #resetButton:hover {
+        #resetButton:hover, #startButton:hover {
             background-color: #e0e0e0;
             color: black;
         }
@@ -129,12 +112,17 @@
 <body>
 
 <h2 id="title">NO<a id="hiddenLink" href="#" class="hidden-link" style="text-decoration: none; color: inherit;">T</a>AM Structure</h2>
-<div class="link-container">
+
+<!-- Start Button Positioned on the Opposite Side of Link Containers -->
+<div class="link-container" style="display: flex; justify-content: space-between;">
     <button id="startButton">START</button>
-    <a href="https://www.faa.gov/documentLibrary/media/Order/7930.2T_Bsc_dtd_12_14_23_FINAL.pdf" target="_blank">7930.2T</a>
-    <a href="https://notams.aim.faa.gov/en2_samples.pdf" target="_blank">ENII Samples</a>
-    <a href="https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dafd/" target="_blank">Chart Supp</a>
+    <div>
+        <a href="https://www.faa.gov/documentLibrary/media/Order/7930.2T_Bsc_dtd_12_14_23_FINAL.pdf" target="_blank">7930.2T</a>
+        <a href="https://notams.aim.faa.gov/en2_samples.pdf" target="_blank">ENII Samples</a>
+        <a href="https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dafd/" target="_blank">Chart Supp</a>
+    </div>
 </div>
+
 <p id="notam-title" class="notam-title">NOTAM 1</p>
 <p id="notam-description" class="description-text">
     As the bitter Alaskan winter began to settle in, a dedicated state employee picked up the phone to report a crucial update to flight service. 
@@ -164,7 +152,7 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const hiddenLink = document.getElementById("hiddenLink");
+        const startButton = document.getElementById("startButton");
         const notamTitleElement = document.getElementById("notam-title");
         const descriptionElement = document.getElementById("notam-description");
         const dropzone = document.getElementById("dropzone");
@@ -175,10 +163,9 @@
         const finalFinishButton = document.getElementById("finalFinishButton");
         const notamDisplay = document.getElementById("correctNotam");
         const resetButton = document.getElementById("resetButton");
-        const startButton = document.getElementById("startButton");
 
         const page1Description = "As the bitter Alaskan winter began to settle in, a dedicated state employee picked up the phone to report a crucial update to flight service. \"Hello, I need to inform you that Talkeetna Runway One Eight Three Six is currently experiencing an issue. The runway edge lights are out of service,\" he explained, his voice tinged with concern. \"This situation will persist from now until the end of December,\" he continued, glancing at his notes for confirmation. \"Please make sure this is communicated to all relevant parties, as it affects our operations through the end of Zulu time.\" The gravity of the message was clear, and he knew it would require pilots to exercise additional caution in the dark, frigid months ahead.";
-        
+
         let currentPage = 1;
         let savedValues = {};
 
@@ -197,7 +184,6 @@
             finishButton.style.display = "none";
             finButton.style.display = "none";
             finalFinishButton.style.display = "none";
-            hideAllNotes();
             savedValues = {};
             localStorage.clear();
 
@@ -205,34 +191,9 @@
             resetButton.classList.add('normal');
         }
 
-        function handleStartButtonClick() {
+        function startPage() {
             resetPage();
-            startButton.style.display = "none";
-        }
-
-        function goToPage(pageNumber) {
-            saveCurrentValues();
-            clearCurrentPage();
-            if (pageNumber === 1 && startButton.style.display !== "none") {
-                startButton.style.display = "block";
-            }
-            switch (pageNumber) {
-                case 1:
-                    notamTitleElement.innerText = "NOTAM 1";
-                    descriptionElement.innerText = page1Description;
-                    document.getElementById("page1-note").classList.remove("hidden");
-                    backButton.style.display = "none";
-                    dropzone.setAttribute("data-correct", "!TKA 06/005 TKA RWY 18/36 REDL U/S 2406121200-2412312359");
-                    notamDisplay.innerText = "!TKA 06/005 TKA RWY 18/36 REDL U/S 2406121200-2412312359";
-                    break;
-                // other cases for different pages (2-5) would go here
-            }
-            currentPage = pageNumber;
-            restoreSavedValues();
-
-            if (currentPage === 1) {
-                resetButton.classList.remove('normal');
-            }
+            startButton.style.display = "none"; // Hide the Start button after it is clicked
         }
 
         function saveCurrentValues() {
@@ -245,6 +206,7 @@
                 finButtonStyle: finButton.style.display,
                 finalFinishButtonStyle: finalFinishButton.style.display
             };
+            // Save the value of the dropzone input for all pages
             localStorage.setItem(`page${currentPage}DropzoneValue`, dropzone.value);
             localStorage.setItem(`page${currentPage}NotamDisplay`, notamDisplay.style.display);
             localStorage.setItem(`page${currentPage}NextButton`, nextButton.style.display);
@@ -253,89 +215,9 @@
             localStorage.setItem(`page${currentPage}FinalFinishButton`, finalFinishButton.style.display);
         }
 
-        function restoreSavedValues() {
-            if (savedValues[currentPage]) {
-                dropzone.value = savedValues[currentPage].dropzoneValue;
-                notamDisplay.innerText = savedValues[currentPage].notamDisplayText;
-                notamDisplay.style.display = savedValues[currentPage].notamDisplayStyle;
-                nextButton.style.display = savedValues[currentPage].nextButtonStyle;
-                finishButton.style.display = savedValues[currentPage].finishButtonStyle;
-                finButton.style.display = savedValues[currentPage].finButtonStyle;
-                finalFinishButton.style.display = savedValues[currentPage].finalFinishButtonStyle;
-            }
-            const pageDropzoneValue = localStorage.getItem(`page${currentPage}DropzoneValue`);
-            if (pageDropzoneValue) {
-                dropzone.value = pageDropzoneValue;
-            }
-            const pageNotamDisplay = localStorage.getItem(`page${currentPage}NotamDisplay`);
-            if (pageNotamDisplay) {
-                notamDisplay.style.display = pageNotamDisplay;
-            }
-            const pageNextButton = localStorage.getItem(`page${currentPage}NextButton`);
-            if (pageNextButton) {
-                nextButton.style.display = pageNextButton;
-            }
-            const pageFinishButton = localStorage.getItem(`page${currentPage}FinishButton`);
-            if (pageFinishButton) {
-                finishButton.style.display = pageFinishButton;
-            }
-            const pageFinButton = localStorage.getItem(`page${currentPage}FinButton`);
-            if (pageFinButton) {
-                finButton.style.display = pageFinButton;
-            }
-            const pageFinalFinishButton = localStorage.getItem(`page${currentPage}FinalFinishButton`);
-            if (pageFinalFinishButton) {
-                finalFinishButton.style.display = pageFinalFinishButton;
-            }
-
-            if (currentPage === 1 && startButton.style.display !== "none") {
-                dropzone.value = "";
-            }
-        }
-
-        function clearCurrentPage() {
-            dropzone.value = "";
-            notamDisplay.style.display = "none";
-            nextButton.style.display = "none";
-            finishButton.style.display = "none";
-            finButton.style.display = "none";
-            finalFinishButton.style.display = "none";
-            hideAllNotes();
-        }
-
-        function hideAllNotes() {
-            document.getElementById("page1-note").classList.add("hidden");
-        }
-
-        startButton.addEventListener("click", handleStartButtonClick);
         dropzone.addEventListener("input", checkAnswer);
-
         resetButton.addEventListener("click", resetPage);
-        nextButton.addEventListener("click", function() {
-            goToPage(currentPage + 1);
-        });
-        backButton.addEventListener("click", function() {
-            goToPage(currentPage - 1);
-        });
-
-        hiddenLink.addEventListener("click", function(event) {
-            event.preventDefault();
-            if (currentPage < 5) {
-                goToPage(currentPage + 1);
-            }
-        });
-
-        const previousPage = localStorage.getItem('previousPage');
-        if (previousPage) {
-            goToPage(parseInt(previousPage));
-            localStorage.removeItem('previousPage');
-        } else {
-            goToPage(1);
-        }
-
-        titleElement.innerText = "NOTAM Structure";
-        notamTitleElement.innerText = "NOTAM 1";
-        descriptionElement.innerText = page1Description;
+        startButton.addEventListener("click", startPage);
     });
 </script>
 
