@@ -18,16 +18,25 @@
         }
 
         .link-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: right;
             margin-bottom: 10px;
             font-size: 24px;
             position: relative;
         }
 
-        .link-container a {
-            margin-right: 20px;
+        .link-container a:nth-child(1) {
+            position: relative;
+            left: -300px;
+        }
+
+        .link-container a:nth-child(2) {
+            position: relative;
+            left: -200px;
+        }
+
+        .link-container a:nth-child(3) {
+            position: relative;
+            left: -100px;
         }
 
         #notam-description {
@@ -104,8 +113,8 @@
 
 <h2 id="title">NO<a id="hiddenLink" href="#" class="hidden-link" style="text-decoration: none; color: inherit;">T</a>AM Structure</h2>
 
-<div class="link-container">
-    <!-- Start Button on the Left Side -->
+<!-- Start Button Positioned on the Opposite Side of Link Containers -->
+<div class="link-container" style="display: flex; justify-content: space-between;">
     <button id="startButton">START</button>
     <div>
         <a href="https://www.faa.gov/documentLibrary/media/Order/7930.2T_Bsc_dtd_12_14_23_FINAL.pdf" target="_blank">7930.2T</a>
