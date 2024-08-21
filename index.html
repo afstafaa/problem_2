@@ -61,7 +61,7 @@
             font-weight: bold;
         }
 
-        #resetButton, #startButton {
+        #resetButton {
             padding: 10px 20px;
             background-color: red;
             color: white;
@@ -71,12 +71,12 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        #resetButton.normal, #startButton.normal {
+        #resetButton.normal {
             background-color: white;
             color: black;
         }
 
-        #resetButton:hover, #startButton:hover {
+        #resetButton:hover {
             background-color: #e0e0e0;
             color: black;
         }
@@ -107,22 +107,34 @@
         .hidden {
             display: none;
         }
+
+        #startButton {
+            position: absolute;
+            left: 0;
+            padding: 10px 20px;
+            background-color: red;
+            color: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #startButton:hover {
+            background-color: #e0e0e0;
+            color: black;
+        }
+
     </style>
 </head>
 <body>
 
 <h2 id="title">NO<a id="hiddenLink" href="#" class="hidden-link" style="text-decoration: none; color: inherit;">T</a>AM Structure</h2>
-
-<!-- Start Button Positioned on the Opposite Side of Link Containers -->
-<div class="link-container" style="display: flex; justify-content: space-between;">
+<div class="link-container">
     <button id="startButton">START</button>
-    <div>
-        <a href="https://www.faa.gov/documentLibrary/media/Order/7930.2T_Bsc_dtd_12_14_23_FINAL.pdf" target="_blank">7930.2T</a>
-        <a href="https://notams.aim.faa.gov/en2_samples.pdf" target="_blank">ENII Samples</a>
-        <a href="https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dafd/" target="_blank">Chart Supp</a>
-    </div>
+    <a href="https://www.faa.gov/documentLibrary/media/Order/7930.2T_Bsc_dtd_12_14_23_FINAL.pdf" target="_blank">7930.2T</a>
+    <a href="https://notams.aim.faa.gov/en2_samples.pdf" target="_blank">ENII Samples</a>
+    <a href="https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/dafd/" target="_blank">Chart Supp</a>
 </div>
-
 <p id="notam-title" class="notam-title">NOTAM 1</p>
 <p id="notam-description" class="description-text">
     As the bitter Alaskan winter began to settle in, a dedicated state employee picked up the phone to report a crucial update to flight service. 
@@ -132,6 +144,10 @@
     of the message was clear, and he knew it would require pilots to exercise additional caution in the dark, frigid months ahead.
 </p>  
 <p id="page1-note" class="description-text" style="font-size: 18px;">(the default NOTAM # will be 06/005 and default start date/time will be 2406121200)</p>
+<p id="page2-note" class="description-text hidden" style="font-size: 18px;">(the default NOTAM # will be 01/009)</p>
+<p id="page3-note" class="description-text hidden" style="font-size: 18px;">(the default NOTAM # will be 07/002)</p>
+<p id="page4-note" class="description-text hidden" style="font-size: 18px;">(the default NOTAM # will be 08/009)</p>
+<p id="page5-note" class="description-text hidden" style="font-size: 18px;">(the default NOTAM # will be 06/011)</p>
 
 <div class="dropzone-container">
     <input class="dropzone" id="dropzone" type="text" data-correct="!TKA 06/005 TKA RWY 18/36 REDL U/S 2406121200-2412312359" style="width:1500px;">
@@ -152,7 +168,7 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const startButton = document.getElementById("startButton");
+        const hiddenLink = document.getElementById("hiddenLink");
         const notamTitleElement = document.getElementById("notam-title");
         const descriptionElement = document.getElementById("notam-description");
         const dropzone = document.getElementById("dropzone");
@@ -163,19 +179,9 @@
         const finalFinishButton = document.getElementById("finalFinishButton");
         const notamDisplay = document.getElementById("correctNotam");
         const resetButton = document.getElementById("resetButton");
+        const startButton = document.getElementById("startButton");
 
         const page1Description = "As the bitter Alaskan winter began to settle in, a dedicated state employee picked up the phone to report a crucial update to flight service. \"Hello, I need to inform you that Talkeetna Runway One Eight Three Six is currently experiencing an issue. The runway edge lights are out of service,\" he explained, his voice tinged with concern. \"This situation will persist from now until the end of December,\" he continued, glancing at his notes for confirmation. \"Please make sure this is communicated to all relevant parties, as it affects our operations through the end of Zulu time.\" The gravity of the message was clear, and he knew it would require pilots to exercise additional caution in the dark, frigid months ahead.";
-
-        let currentPage = 1;
-        let savedValues = {};
-
-        function checkAnswer() {
-            if (dropzone.value === dropzone.getAttribute("data-correct")) {
-                notamDisplay.style.display = "block";
-                nextButton.style.display = "inline-block";
-            }
-            saveCurrentValues();
-        }
 
         function resetPage() {
             dropzone.value = "";
@@ -184,40 +190,42 @@
             finishButton.style.display = "none";
             finButton.style.display = "none";
             finalFinishButton.style.display = "none";
-            savedValues = {};
+            hideAllNotes();
             localStorage.clear();
-
-            // Change the Reset button style back to normal after clicking it
             resetButton.classList.add('normal');
         }
 
-        function startPage() {
+        function hideStartButton() {
+            startButton.style.display = 'none';
+        }
+
+        startButton.addEventListener("click", function() {
             resetPage();
-            startButton.style.display = "none"; // Hide the Start button after it is clicked
+            hideStartButton();
+        });
+
+        hiddenLink.addEventListener("click", function(event) {
+            event.preventDefault();
+            if (hiddenLink.style.display !== 'none') {
+                // Continue normal operations for hidden link
+            }
+        });
+
+        // Ensure the START button is shown only once
+        if (localStorage.getItem('startClicked')) {
+            hideStartButton();
+        } else {
+            localStorage.setItem('startClicked', true);
         }
 
-        function saveCurrentValues() {
-            savedValues[currentPage] = {
-                dropzoneValue: dropzone.value,
-                notamDisplayText: notamDisplay.innerText,
-                notamDisplayStyle: notamDisplay.style.display,
-                nextButtonStyle: nextButton.style.display,
-                finishButtonStyle: finishButton.style.display,
-                finButtonStyle: finButton.style.display,
-                finalFinishButtonStyle: finalFinishButton.style.display
-            };
-            // Save the value of the dropzone input for all pages
-            localStorage.setItem(`page${currentPage}DropzoneValue`, dropzone.value);
-            localStorage.setItem(`page${currentPage}NotamDisplay`, notamDisplay.style.display);
-            localStorage.setItem(`page${currentPage}NextButton`, nextButton.style.display);
-            localStorage.setItem(`page${currentPage}FinishButton`, finishButton.style.display);
-            localStorage.setItem(`page${currentPage}FinButton`, finButton.style.display);
-            localStorage.setItem(`page${currentPage}FinalFinishButton`, finalFinishButton.style.display);
+        function hideAllNotes() {
+            document.getElementById("page1-note").classList.add("hidden");
+            document.getElementById("page2-note").classList.add("hidden");
+            document.getElementById("page3-note").classList.add("hidden");
+            document.getElementById("page4-note").classList.add("hidden");
+            document.getElementById("page5-note").classList.add("hidden");
         }
 
-        dropzone.addEventListener("input", checkAnswer);
-        resetButton.addEventListener("click", resetPage);
-        startButton.addEventListener("click", startPage);
     });
 </script>
 
