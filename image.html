@@ -9,8 +9,9 @@
 
     <script>
         function goBack() {
-            window.location.href = "your_html_file_name.html";  // Replace with the actual HTML file name where your script resides
-            localStorage.setItem('previousPage', 5);  // Set to return to Page 5
+            // Ensure the user is taken back to Page 5
+            localStorage.setItem('previousPage', 5);  
+            window.location.href = "image.html";  // Replace with your main HTML file name
         }
     </script>
 </body>
