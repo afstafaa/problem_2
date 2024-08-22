@@ -417,7 +417,15 @@
 
         finalFinishButton.addEventListener("click", handleFinalFinishButtonClick);
 
-        goToPage(0);  // Start on Page 0
+        // Automatically go to the previous page if stored
+        const previousPage = localStorage.getItem('previousPage');
+        if (previousPage) {
+            goToPage(parseInt(previousPage));  // Go to the stored page number
+            localStorage.removeItem('previousPage');  // Clear the stored value
+        } else {
+            goToPage(0);  // Start on Page 0 if no previous page is stored
+        }
+
     });
 </script>
 
