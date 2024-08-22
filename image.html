@@ -33,8 +33,12 @@
 
 <script>
     document.getElementById("backButtonTop").addEventListener("click", function() {
-        localStorage.setItem('previousPage', 5);
-        window.location.href = "image.html";  // Replace with the actual HTML file name where your original script resides
+        const previousURL = localStorage.getItem('previousURL');
+        if (previousURL) {
+            window.location.href = previousURL;
+        } else {
+            window.location.href = "image.html";
+        }
     });
 </script>
 
