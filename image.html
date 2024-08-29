@@ -2,39 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NOTAM Image</title>
+    <title>Image Page</title>
     <style>
-        #backButtonTop {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #backButton {
             padding: 10px 20px;
             background-color: #f8f8f8;
             border: 1px solid #ccc;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin: 20px;
         }
 
-        #backButtonTop:hover {
+        #backButton:hover {
             background-color: #e0e0e0;
         }
 
-        img {
-            display: block;
-            margin: 50px auto;
-            max-width: 90%;
+        .image-container {
+            text-align: center;
+            margin-top: 50px;
         }
     </style>
 </head>
 <body>
 
-<button id="backButtonTop">Back</button>
+<div class="image-container">
+    <button id="backButtonTop">Back</button>
 <img src="images/image.png" alt="NOTAM Image">
+</div>
+
+<button id="backButton">Back</button>
 
 <script>
-    document.getElementById("backButtonTop").addEventListener("click", function() {
-        localStorage.setItem('previousPage', 5);  
-        window.location.href = "image.html";  
+    document.addEventListener("DOMContentLoaded", function() {
+        const backButton = document.getElementById("backButton");
+
+        backButton.addEventListener("click", function() {
+            const previousURL = localStorage.getItem('previousURL');
+            if (previousURL) {
+                window.location.href = previousURL;
+            } else {
+                window.location.href = "image.html";
+            }
+        });
     });
 </script>
 
